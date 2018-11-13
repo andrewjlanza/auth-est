@@ -1,26 +1,42 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+
+import "./App.css";
+
+import Home from "./Pages/Home";
+import Callback from "./Pages/Callback";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
+import Auth from "./Auth/Auth";
+import history from "./history";
+
+const auth = new Auth();
+
+const handleAuthentication = (nextState, replace) => {
+  if (/access_token|id_token|error/.test(nextState.location.hash)) {
+    auth.handleAuthentication();
+  }
+};
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <Router history={history} component={App}>
+        <Switch>
+          <Route
+            path="/"
+            exact
+            render={props => <Home auth={auth} {...props} />}
+          />
+          <Route
+            path="/callback"
+            exact
+            render={props => {
+              handleAuthentication(props);
+              return <Callback {...props} />;
+            }}
+          />
+        </Switch>
+      </Router>
     );
   }
 }
